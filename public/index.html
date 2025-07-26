@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Screenshot</title>
+  </head>
+  <body>
+    <h1>Screenshot</h1>
+    <form>
+      <input type="text" name="url" placeholder="URL" required />
+      <button type="submit">Take Screenshot</button>
+    </form>
+    <img id="screenshot-preview" />
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      socket.on("connect", () => {
+        console.log("Socket connected:", socket.id);
+      });
+
+      socket.on("screenshot:success", (data) => {
+        const img = document.querySelector("#screenshot-preview");
+        img.src = "/uploads/" + data.filename;
+        img.alt = data.title;
+      });
+
+      const form = document.querySelector("form");
+      const img = document.querySelector("#screenshot-preview");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const url = e.target.elements.url.value;
+
+        socket.emit("screenshot", url);
+      });
+    </script>
+  </body>
+</html>
